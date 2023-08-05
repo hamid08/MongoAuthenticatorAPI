@@ -37,15 +37,35 @@ namespace MongoAuthenticatorAPI.Controllers
             if (user is null || !validPassword) return BadRequest("Invalid email/password");
 
             //ایجاد توکن
-            var result = _tokenService.TokenGenerator(user.Id, user.UserName);
+            //all is well if ew reach here
+            var claims = new List<Claim>
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+            };
+            var roles = await _userManager.GetRolesAsync(user);
+            var roleClaims = roles.Select(x => new Claim(ClaimTypes.Role, x));
+            claims.AddRange(roleClaims);
+
+
+            var result = _tokenService.GenerateAccessToken(claims);
+            var refreshToken =_tokenService.GenerateRefreshToken();
 
             //ذخیره رفرش توکن
-           
-            user.ExpirationRefreshToken = result.RefreshTokenExpiration;
-            user.RefreshToken = result.RefreshToken;
+
+            user.ExpirationRefreshToken = DateTime.UtcNow;
+            user.RefreshToken = refreshToken;
             await _userManager.UpdateAsync(user);
 
-            return Ok(result);
+            return Ok(new TokenResultVM
+            {
+                AccessToken = result.token,
+                AccessTokenExpiration = result.expiration,
+                RefreshTokenExpiration = DateTime.UtcNow,
+                RefreshToken = refreshToken
+            });
         }
 
         [HttpPost]

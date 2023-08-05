@@ -92,8 +92,8 @@ builder.Services.AddAuthentication(x =>
     x.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuerSigningKey = true,
-        ValidateIssuer = true,
-        ValidateAudience = true,
+        ValidateIssuer = false,
+        ValidateAudience = false,
         ValidateLifetime = true,
         //ValidIssuer = "https://localhost:5001",
         //ValidAudience = "https://localhost:5001",

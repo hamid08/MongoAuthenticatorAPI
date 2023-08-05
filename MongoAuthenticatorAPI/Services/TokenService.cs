@@ -4,8 +4,10 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using MongoAuthenticatorAPI.Models;
 using MongoAuthenticatorAPI.Models.ViewModel;
 
 namespace MongoAuthenticatorAPI.Services
@@ -13,7 +15,7 @@ namespace MongoAuthenticatorAPI.Services
     public class TokenService : ITokenService
     {
         private readonly IConfiguration _configuration;
-
+      
         public TokenService(IConfiguration configuration)
         {
             _configuration = configuration;
